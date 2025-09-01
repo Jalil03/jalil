@@ -1,0 +1,352 @@
+@import "tailwindcss";
+
+
+/* --- layout guard (prevents any child from forcing horizontal scroll) --- */
+*, *::before, *::after { box-sizing: border-box; min-width: 0; }
+html, body { width: 100%; max-width: 100%; overflow-x: clip; } /* Safari 16+ */
+@supports not (overflow-x: clip) {
+  html, body { overflow-x: hidden; } /* fallback */
+}
+/* media elements never overflow their container */
+img, svg, video, canvas { display:block; max-width:100%; height:auto; }
+
+
+
+
+
+
+
+/* ---------- Light (default): white + blue ---------- */
+:root{
+  --bg-base:#FFFFFF;      /* page */
+  --bg-card:#F9FAFB;      /* cards */
+  --bg-elevated:#EEF2F7;  /* chips, subtle fills */
+  --text:#0E1116;         /* main text */
+  --subtext:#566073;      /* secondary text */
+  --accent:#2563EB;       /* BLUE accent (light mode) */
+  --accent-hi:#06B6D4;    /* gradient second color (cyan) */
+  --border:#E6E8F0;
+  --blob-speed: 3s;
+
+  /* page-wide overlays */
+  --glow1: rgba(37,99,235,.10);   /* blue glow */
+  --glow2: rgba(6,182,212,.08);   /* cyan glow */
+  --grid:  rgba(0,0,0,.10);       /* grid lines */
+  --header-tint: rgba(255,255,255,.55);   /* light theme */
+}
+
+/* ---------- Dark: charcoal + violet ---------- */
+.theme-dark{
+  --bg-base:#0B0B10;
+  --bg-card:#0F1117;
+  --bg-elevated:#1A1F2B;
+  --text:#E6E8F0;
+  --subtext:#9AA4B2;
+  --accent:#8B5CF6;       /* VIOLET accent (dark mode) */
+  --accent-hi:#D946EF;    /* gradient second color (pink) */
+  --border:#1F2430;
+
+  --glow1: rgba(139,92,246,.18);  /* violet glow */
+  --glow2: rgba(217,70,239,.12);  /* pink glow */
+  --grid:  rgba(255,255,255,.12);/* grid lines */
+  --header-tint: rgba(11,11,16,.55);
+  --blob-speed: 2.5s;   
+}
+
+/* ---------- Page-wide background (applies to ALL sections) ---------- */
+html, body{
+  background-color: var(--bg-base);
+  color: var(--text);
+  background-image:
+    radial-gradient(600px 300px at 85% -10%, var(--glow1), transparent 60%),
+    radial-gradient(500px 300px at 0% 110%, var(--glow2), transparent 60%),
+    repeating-linear-gradient(0deg, transparent 0 24px, var(--grid) 24px 26px);
+  background-attachment: fixed; /* keep lines/glow static while scrolling */
+}
+
+/* ---------- helpers using the variables ---------- */
+.bg-base{
+  /* let the body background show through */
+  background-color: transparent !important;
+}
+.bg-card{ background:var(--bg-card) !important; }
+.bg-elevated{ background:var(--bg-elevated) !important; }
+.text-text{ color:var(--text) !important; }
+.text-subtext{ color:var(--subtext) !important; }
+.text-accent{ color:var(--accent) !important; }
+.bg-accent{ background:var(--accent) !important; color:#fff !important; }
+.border-base{ border-color:var(--border) !important; }
+
+/* ---------- components ---------- */
+.card{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:0 1px 8px rgba(0,0,0,.05);
+  transition:.2s transform, .2s box-shadow;
+}
+.card:hover{ transform:translateY(-2px); box-shadow:0 12px 24px rgba(0,0,0,.08); }
+
+.badge{
+  font-size:.75rem; padding:.25rem .5rem; border-radius:999px;
+  background:var(--bg-elevated); color:var(--subtext);
+}
+
+.btn{
+  display:inline-flex; align-items:center; gap:.5rem; border-radius:12px;
+  padding:.55rem 1rem; border:1px solid var(--border);
+}
+.btn-primary{ background:var(--accent); color:#fff; border-color:transparent; }
+.btn-ghost{ background:var(--bg-elevated); color:var(--text); }
+.container{ max-width:1200px; margin:0 auto; padding:0 1.5rem; }
+
+/* ---------- utilities ---------- */
+.text-gradient{
+  background: linear-gradient(90deg, var(--accent), var(--accent-hi));
+  -webkit-background-clip: text; color: transparent;
+}
+
+/* REMOVE any old hero-layer background — now the page background handles it */
+/* (intentionally no .hero-layer rules here) */
+
+
+/* Morphing “venom” blob */
+.hero-blob{
+  aspect-ratio: 1 / 1;
+  border-radius: 58% 42% 37% 63% / 46% 33% 67% 54%;
+  animation: blobMorph var(--blob-speed) cubic-bezier(.4,0,.2,1) infinite;
+  will-change: border-radius, transform;
+}
+
+@keyframes blobMorph{
+  0%   { border-radius: 58% 42% 37% 63% / 46% 33% 67% 54%; }
+  33%  { border-radius: 40% 60% 55% 45% / 48% 58% 42% 52%; }
+  66%  { border-radius: 62% 38% 48% 52% / 40% 60% 40% 60%; }
+  100% { border-radius: 58% 42% 37% 63% / 46% 33% 67% 54%; }
+}
+
+/* Perfect circle option */
+.hero-circle{
+  aspect-ratio: 1 / 1;
+  border-radius: 9999px;
+}
+
+
+
+/* --- Header controls --- */
+.icon-btn{
+  width: 38px; height: 38px;
+  display: inline-grid; place-items: center;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg-card) 65%, transparent);
+  transition: background-color .18s, border-color .18s, transform .18s, box-shadow .18s;
+}
+.icon-btn:hover{
+  background: var(--bg-elevated);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  transform: translateY(-1px);
+}
+.icon-btn:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.link-pill{
+  display:inline-flex; align-items:center; gap:.5rem;
+  padding:.45rem .8rem; border-radius:9999px;
+  border:1px solid var(--border);
+  color:var(--subtext); background: color-mix(in srgb, var(--bg-card) 65%, transparent);
+  transition: background-color .18s, border-color .18s, color .18s, transform .18s;
+}
+.link-pill:hover{
+  color:var(--text);
+  background: var(--bg-elevated);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  transform: translateY(-1px);
+}
+.link-pill svg{ width:16px; height:16px; }
+
+
+
+/* toggle by theme */
+.only-dark  { display: none; }
+.only-light { display: block; }
+.theme-dark .only-dark  { display: block; }
+.theme-dark .only-light { display: none; }
+
+/* hide the visual below md */
+@media (max-width: 767.98px) {
+  .only-md-up { display: none; }
+}
+
+
+/* Hide horizontal scrollbar but keep scrollability */
+.no-scrollbar {
+  -ms-overflow-style: none;      /* IE/Edge */
+  scrollbar-width: none;         /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;                 /* Chrome/Safari */
+}
+
+
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+
+/* --- Buttons that feel premium --- */
+.btn-lg { padding: .875rem 1.15rem; border-radius: 14px; font-weight: 600; }
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-hi));
+  color: #fff; border-color: transparent;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 30%, transparent);
+  transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
+}
+.btn-primary:hover { filter: brightness(1.05); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+
+.btn-ghost {
+  background: transparent; color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--border) 80%, var(--accent) 20%);
+  transition: background .15s ease, border-color .15s ease;
+}
+.btn-ghost:hover {
+  background: color-mix(in srgb, var(--bg-elevated) 85%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border) 60%);
+}
+
+/* --- Softer chips --- */
+.badge {
+  font-size: .78rem; padding: .28rem .56rem; border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-elevated) 85%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
+  color: var(--subtext);
+}
+
+/* Hide horizontal scrollbar where we want gentle swipe */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Make the background lines lighter on mobile for readability */
+@media (max-width: 767.98px) {
+  :root      { --grid: rgba(0,0,0,.02); }
+  .theme-dark{ --grid: rgba(255,255,255,.02); }
+}
+
+
+
+/* ===== Marquee / Ticker (fixed height + vertical centering) ===== */
+.marquee{
+  --marquee-duration: 18s;   /* can be overridden inline */
+  --marquee-h: 38px;         /* height of the lane */
+  position: relative;
+  overflow: hidden;
+  height: var(--marquee-h);
+  padding: 0;                /* no extra padding so nothing clips */
+  isolation: isolate;
+}
+
+/* each group scrolls across; we center them vertically via translateY(-50%) */
+.marquee-group{
+  position: absolute;
+  top: 50%;
+  left: 0;
+  display: inline-flex;
+  gap: .5rem;
+  white-space: nowrap;
+  will-change: transform;
+  animation: marquee var(--marquee-duration) linear infinite;
+  z-index: 1;
+}
+
+/* the duplicate starts one width to the right */
+.marquee-group--dup{
+  transform: translate(100%, -50%);
+}
+
+/* pause on hover if you want */
+.marquee-pauseable:hover{ animation-play-state: paused; }
+
+/* consistent chip height so the lane height is predictable */
+.marquee-chip{
+  display: inline-flex;
+  align-items: center;
+  height: 30px;              /* <= keep below --marquee-h */
+  padding: 0 .7rem;
+  font-size: .82rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-elevated) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  color: var(--text);
+  white-space: nowrap;
+  transition: transform .15s ease;
+}
+.marquee-chip:hover{ transform: translateY(-1px); }
+
+@keyframes marquee{
+  from { transform: translate(0, -50%); }
+  to   { transform: translate(-100%, -50%); }
+}
+
+/* edge fades */
+.marquee-fade-left,
+.marquee-fade-right{
+  pointer-events: none;
+  position: absolute;
+  top: 0; bottom: 0; width: 40px;
+  z-index: 2;
+}
+.marquee-fade-left{
+  left: 0;
+  background: linear-gradient(to right, var(--bg-base), transparent);
+}
+.marquee-fade-right{
+  right: 0;
+  background: linear-gradient(to left, var(--bg-base), transparent);
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .marquee-group{ animation: none; transform: translate(0, -50%); }
+  .marquee-group--dup{ display: none; }
+}
+
+
+/* --- full-bleed helper (lets a block span the whole viewport width) --- */
+.full-bleed {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+
+
+/* default: CONTAINED on mobile */
+.full-bleed{
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  left: auto;
+  right: auto;
+}
+
+/* md+: break out to the viewport width safely */
+@media (min-width: 768px){
+  .full-bleed{
+    position: relative;
+    left: 50%;
+    right: 50%;
+    width: 100dvw;
+    margin-left: -50dvw;
+    margin-right: -50dvw;
+  }
+  @supports not (width: 100dvw){
+    .full-bleed{ width: 100vw; margin-left: -50vw; margin-right: -50vw; }
+  }
+}
+
+
