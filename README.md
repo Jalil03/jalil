@@ -215,16 +215,6 @@ npm run preview   # preview production build locally
 
 ---
 
-## 📸 Screenshots
-
-> Add real screenshots or GIFs here.
-
-| Home (Dark) | Projects (Modal) |
-| --- | --- |
-| ![Home Dark](./public/screens/home-dark.png) | ![Projects](./public/screens/projects-modal.png) |
-
----
-
 ## 🗺️ Roadmap
 
 - [ ] SEO meta tags & OpenGraph previews
