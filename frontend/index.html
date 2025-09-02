@@ -1,10 +1,27 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+    <meta charset="UTF-8" /> <!-- ✅ Fix encoding issue -->
+
+    <!-- Preconnect for faster font fetch -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Preload your font CSS -->
+    <link rel="preload" as="style" href="/fonts.css">
+    <link rel="stylesheet" href="/fonts.css">
+
+    <!-- ✅ Your favicon/logo -->
+    <link rel="icon" type="image/png" href="/logo1.png" />
+    <!-- Or use the file you uploaded: -->
+    <!-- <link rel="icon" type="image/png" href="/9aa4ccd2-03b3-49ec-919c-30ae3b924b50.png" /> -->
+
+    <title>Abdeljalil Bouzine — ML & Data Systems</title>
+    <meta name="description" content="Portfolio showcasing ML, data systems, and AI projects." />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="og:title" content="Abdeljalil Bouzine — Portfolio" />
+    <meta property="og:description" content="Selected ML & data systems work." />
+    <meta property="og:image" content="/og.png" />
+    <meta name="theme-color" content="#0b0b0f" />
   </head>
   <body>
     <div id="root"></div>

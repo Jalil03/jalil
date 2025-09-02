@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-
 /* --- layout guard (prevents any child from forcing horizontal scroll) --- */
 *, *::before, *::after { box-sizing: border-box; min-width: 0; }
 html, body { width: 100%; max-width: 100%; overflow-x: clip; } /* Safari 16+ */
@@ -9,12 +8,6 @@ html, body { width: 100%; max-width: 100%; overflow-x: clip; } /* Safari 16+ */
 }
 /* media elements never overflow their container */
 img, svg, video, canvas { display:block; max-width:100%; height:auto; }
-
-
-
-
-
-
 
 /* ---------- Light (default): white + blue ---------- */
 :root{
@@ -26,7 +19,11 @@ img, svg, video, canvas { display:block; max-width:100%; height:auto; }
   --accent:#2563EB;       /* BLUE accent (light mode) */
   --accent-hi:#06B6D4;    /* gradient second color (cyan) */
   --border:#E6E8F0;
-  --blob-speed: 3s;
+
+  /* blob animation speeds (tweak freely) */
+  --blob-speed-morph: 8s;
+  --blob-speed-drift: 14s;
+  --blob-speed-rotate: 32s;
 
   /* page-wide overlays */
   --glow1: rgba(37,99,235,.10);   /* blue glow */
@@ -48,9 +45,13 @@ img, svg, video, canvas { display:block; max-width:100%; height:auto; }
 
   --glow1: rgba(139,92,246,.18);  /* violet glow */
   --glow2: rgba(217,70,239,.12);  /* pink glow */
-  --grid:  rgba(255,255,255,.12);/* grid lines */
+  --grid:  rgba(255,255,255,.12); /* grid lines */
   --header-tint: rgba(11,11,16,.55);
-  --blob-speed: 2.5s;   
+
+  /* slightly quicker in dark */
+  --blob-speed-morph: 7s;
+  --blob-speed-drift: 12s;
+  --blob-speed-rotate: 28s;
 }
 
 /* ---------- Page-wide background (applies to ALL sections) ---------- */
@@ -65,10 +66,7 @@ html, body{
 }
 
 /* ---------- helpers using the variables ---------- */
-.bg-base{
-  /* let the body background show through */
-  background-color: transparent !important;
-}
+.bg-base{ background-color: transparent !important; } /* let body bg show through */
 .bg-card{ background:var(--bg-card) !important; }
 .bg-elevated{ background:var(--bg-elevated) !important; }
 .text-text{ color:var(--text) !important; }
@@ -106,32 +104,52 @@ html, body{
   -webkit-background-clip: text; color: transparent;
 }
 
-/* REMOVE any old hero-layer background — now the page background handles it */
-/* (intentionally no .hero-layer rules here) */
-
-
-/* Morphing “venom” blob */
+/* ===================== Hero “venom” blob ===================== */
 .hero-blob{
   aspect-ratio: 1 / 1;
   border-radius: 58% 42% 37% 63% / 46% 33% 67% 54%;
-  animation: blobMorph var(--blob-speed) cubic-bezier(.4,0,.2,1) infinite;
-  will-change: border-radius, transform;
+  animation:
+    blobMorph  var(--blob-speed-morph)  ease-in-out infinite alternate,
+    blobDrift  var(--blob-speed-drift)  ease-in-out infinite alternate,
+    blobRotate var(--blob-speed-rotate) linear      infinite;
+  will-change: transform, border-radius;
+  transform: translate3d(0,0,0);
+  backface-visibility: hidden;
+  contain: layout paint;
 }
 
+/* morph the outline */
 @keyframes blobMorph{
   0%   { border-radius: 58% 42% 37% 63% / 46% 33% 67% 54%; }
-  33%  { border-radius: 40% 60% 55% 45% / 48% 58% 42% 52%; }
-  66%  { border-radius: 62% 38% 48% 52% / 40% 60% 40% 60%; }
+  25%  { border-radius: 52% 48% 40% 60% / 44% 56% 44% 56%; }
+  50%  { border-radius: 40% 60% 55% 45% / 48% 58% 42% 52%; }
+  75%  { border-radius: 62% 38% 48% 52% / 40% 60% 40% 60%; }
   100% { border-radius: 58% 42% 37% 63% / 46% 33% 67% 54%; }
 }
 
-/* Perfect circle option */
+/* add a slow float + micro-scale “breathing” */
+@keyframes blobDrift{
+  0%   { transform: translate3d( 0px,  0px, 0) scale(1.00); }
+  50%  { transform: translate3d(10px, -8px, 0) scale(1.03); }
+  100% { transform: translate3d(-6px, 12px, 0) scale(1.00); }
+}
+
+/* tiny rotation so it feels alive but not dizzy */
+@keyframes blobRotate{
+  from { rotate: 0deg; }
+  to   { rotate: 360deg; }
+}
+
+/* Perfect circle option (if you need it) */
 .hero-circle{
   aspect-ratio: 1 / 1;
   border-radius: 9999px;
 }
 
-
+/* Respect reduced-motion */
+@media (prefers-reduced-motion: reduce){
+  .hero-blob{ animation: none; }
+}
 
 /* --- Header controls --- */
 .icon-btn{
@@ -167,8 +185,6 @@ html, body{
 }
 .link-pill svg{ width:16px; height:16px; }
 
-
-
 /* toggle by theme */
 .only-dark  { display: none; }
 .only-light { display: block; }
@@ -180,20 +196,9 @@ html, body{
   .only-md-up { display: none; }
 }
 
-
 /* Hide horizontal scrollbar but keep scrollability */
-.no-scrollbar {
-  -ms-overflow-style: none;      /* IE/Edge */
-  scrollbar-width: none;         /* Firefox */
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none;                 /* Chrome/Safari */
-}
-
-
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
-
 
 /* --- Buttons that feel premium --- */
 .btn-lg { padding: .875rem 1.15rem; border-radius: 14px; font-weight: 600; }
@@ -224,17 +229,11 @@ html, body{
   color: var(--subtext);
 }
 
-/* Hide horizontal scrollbar where we want gentle swipe */
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-.no-scrollbar::-webkit-scrollbar { display: none; }
-
 /* Make the background lines lighter on mobile for readability */
 @media (max-width: 767.98px) {
   :root      { --grid: rgba(0,0,0,.02); }
   .theme-dark{ --grid: rgba(255,255,255,.02); }
 }
-
-
 
 /* ===== Marquee / Ticker (fixed height + vertical centering) ===== */
 .marquee{
@@ -261,9 +260,7 @@ html, body{
 }
 
 /* the duplicate starts one width to the right */
-.marquee-group--dup{
-  transform: translate(100%, -50%);
-}
+.marquee-group--dup{ transform: translate(100%, -50%); }
 
 /* pause on hover if you want */
 .marquee-pauseable:hover{ animation-play-state: paused; }
@@ -312,26 +309,12 @@ html, body{
   .marquee-group--dup{ display: none; }
 }
 
-
 /* --- full-bleed helper (lets a block span the whole viewport width) --- */
 .full-bleed {
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-}
-
-
-
-/* default: CONTAINED on mobile */
-.full-bleed{
   width: 100%;
-  margin-left: 0;
-  margin-right: 0;
-  left: auto;
-  right: auto;
+  left: auto; right: auto;
+  margin-left: 0; margin-right: 0;
+  position: relative;
 }
 
 /* md+: break out to the viewport width safely */
@@ -349,4 +332,15 @@ html, body{
   }
 }
 
+/*-------------------------- This is for test -------------------------------*/
+.bg-surface   { background: var(--bg-card) !important; }
+.bg-surface-95{ background: color-mix(in srgb, var(--bg-card) 95%, transparent) !important; }
+.bg-primary   { background: var(--accent) !important; color:#fff !important; }
+.ring-primary { --tw-ring-color: color-mix(in srgb, var(--accent) 55%, transparent); }
 
+@media (max-width: 640px){
+  .card .swiper-button-prev,
+  .card .swiper-button-next,
+  .card .splide__arrow,
+  .card .embla__button { display: none !important; }
+}

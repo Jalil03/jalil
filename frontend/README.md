@@ -13,3 +13,9 @@ If you are developing a production application, we recommend using TypeScript wi
 
 
 and this version is the simple first version , nothing fancy just smtg to start with . 
+
+
+things im thinking of adding : 
+    - Chatbot assistant 
+    - A little game kinda that lets us pick the model and its parameters withou coding ( just an interface )
+    
